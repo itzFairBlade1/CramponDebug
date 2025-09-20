@@ -1,0 +1,22 @@
+# Ignore build files
+/bin/
+/obj/
+*.dll
+*.exe
+*.pdb
+
+# Ignore Unity temporary files
+Library/
+Temp/
+Logs/
+UserSettings/
+Build/
+
+# Ignore IDE files
+.vscode/
+*.user
+*.suo
+
+# Ignore other system files
+.DS_Store
+Thumbs.db
