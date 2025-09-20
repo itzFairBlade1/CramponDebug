@@ -1,6 +1,8 @@
 # Ignore build files
 /bin/
 /obj/
+bin/
+obj/
 *.dll
 *.exe
 *.pdb
@@ -16,7 +18,15 @@ Build/
 .vscode/
 *.user
 *.suo
+.vs/
 
 # Ignore other system files
 .DS_Store
 Thumbs.db
+
+# random gitignore stuff i stole
+.vs
+bin
+**/obj
+GamePath.props
+build/*.zip
