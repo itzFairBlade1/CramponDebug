@@ -2,7 +2,6 @@
 using Rewired;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 [assembly: MelonInfo(typeof(CramponDebug.Core), "CramponDebug", "1.0.0", "Fair", null)]
 [assembly: MelonGame("TraipseWare", "Peaks of Yore")]
@@ -96,7 +95,7 @@ namespace CramponDebug
             if (playerMove != null)
             {
                 bool isGrounded = playerMove.IsGrounded();
-                if (!lastStateGroundedBool && isGrounded) LoggerInstance.Msg("#The Player is grounded.");
+                if (!lastStateGroundedBool && isGrounded) LoggerInstance.Msg("------------#The Player is grounded#------------");
                 lastStateGroundedBool = isGrounded;
             }
 
@@ -104,7 +103,7 @@ namespace CramponDebug
             if (climbing != null)
             {
                 bool isClimbing = climbing.grabbingLeft || climbing.grabbingRight;
-                if (!lastStateClimbingBool && isClimbing) LoggerInstance.Msg("#The Player has reached a hold.");
+                if (!lastStateClimbingBool && isClimbing) LoggerInstance.Msg("------------#The Player has reached a hold#------------");
                 lastStateClimbingBool = isClimbing;
             }
 
@@ -115,11 +114,11 @@ namespace CramponDebug
                 bool usingRightAxe = iceaxes.usingIceAxeR;
 
 
-                if (!lastStateUsingAxeL && usingLextAxe) LoggerInstance.Msg("#The Player has equipped the left ice axe.");
-                if (lastStateUsingAxeL && !usingLextAxe) LoggerInstance.Msg("#The Player has unequipped the left ice axe.");
+                if (!lastStateUsingAxeL && usingLextAxe) LoggerInstance.Msg("#The Player has equipped the left ice axe#");
+                if (lastStateUsingAxeL && !usingLextAxe) LoggerInstance.Msg("#The Player has unequipped the left ice axe#");
 
-                if (!lastStateUsingAxeR && usingRightAxe) LoggerInstance.Msg("#The Player has equipped the right ice axe.");
-                if (lastStateUsingAxeR && !usingRightAxe) LoggerInstance.Msg("#The Player has unequipped the right ice axe.");
+                if (!lastStateUsingAxeR && usingRightAxe) LoggerInstance.Msg("#The Player has equipped the right ice axe#");
+                if (lastStateUsingAxeR && !usingRightAxe) LoggerInstance.Msg("#The Player has unequipped the right ice axe#");
 
 
                 lastStateUsingAxeL = usingLextAxe;
