@@ -17,6 +17,8 @@ a pc (nooo wayyyy)
 
 # -HOW TO INSTALL-
 
+download the dll file from the githubs release page
+
 put .dll file into the melonLoader's generated Mods folder
 
 melonLoader download: https://melonwiki.xyz/#
@@ -28,7 +30,7 @@ the hand timing is 0.6s or 100 bpm
 
 the pickaxe timing is 0.7s or 85 bpm
 
-Idk the crampon timing
+the crampon timing is 1s or 60bpm
 
 
 if you have any suggestion please tell me i might add them. This is my first ever mod to any game so i dont know what im doing.
