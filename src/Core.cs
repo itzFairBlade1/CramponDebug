@@ -1,18 +1,16 @@
-﻿using MelonLoader;
-using Rewired;
-using System.Reflection;
-using UnityEngine;
+﻿using System.Reflection;
 
-[assembly: MelonInfo(typeof(CramponDebug.Core), "CramponDebug", "1.0.0", "Fair", null)]
-[assembly: MelonGame("TraipseWare", "Peaks of Yore")]
+using BepInEx;
+using Rewired;
+using UnityEngine;
 
 namespace CramponDebug
 {
-    public class Core : MelonMod
+    [BepInPlugin("com.github.itzFairBlade1.CramponDebug", "Crampon Debug", PluginInfo.PLUGIN_VERSION)]
+    public class Core : BaseUnityPlugin
     {
         private bool lastStateGroundedBool;
         private bool lastStateClimbingBool;
-        
 
         private PlayerMove playerMove;
         private Climbing climbing;
@@ -20,7 +18,6 @@ namespace CramponDebug
         private FieldInfo isOnCooldownField;
         private Player player;
         private IceAxe iceaxes;
-
 
         private bool isTrackingHandTimerL = false;
         private bool isTrackingHandTimerR = false;
@@ -30,29 +27,23 @@ namespace CramponDebug
         private bool lastStateUsingAxeL = false;
         private bool lastStateUsingAxeR = false;
 
-
         private float handTimerStartL = 0f;
         private float handTimerStartR = 0f;
 
         private float cramponTimerStart = 0f;
 
-
         private int playerID;
 
-
-
-
-        public override void OnInitializeMelon()
+        public void Awake()
         {
-            LoggerInstance.Msg("CramponDebug Initialized.");
+            Logger.LogInfo("CramponDebug Initialized.");
             isOnCooldownField = typeof(StemFoot).GetField("isOnCooldown", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
-
-        public override void OnUpdate()
+        public void Update()
         {
             GetObjects(); // Loads Scripts
-            CheckHastagProperties(); // Logs Hashtag Messages
+            CheckHastagProperties(); // Logs Hashtag Infos
             CheckTiming(); // Responsible for everything else .-.
         }
 
@@ -88,14 +79,13 @@ namespace CramponDebug
             }
         }
 
-
         public void CheckHastagProperties()
         {
             // player touching ground
             if (playerMove != null)
             {
                 bool isGrounded = playerMove.IsGrounded();
-                if (!lastStateGroundedBool && isGrounded) LoggerInstance.Msg("------------#The Player is grounded#------------");
+                if (!lastStateGroundedBool && isGrounded) Logger.LogInfo("------------#The Player is grounded#------------");
                 lastStateGroundedBool = isGrounded;
             }
 
@@ -103,7 +93,7 @@ namespace CramponDebug
             if (climbing != null)
             {
                 bool isClimbing = climbing.grabbingLeft || climbing.grabbingRight;
-                if (!lastStateClimbingBool && isClimbing) LoggerInstance.Msg("------------#The Player has reached a hold#------------");
+                if (!lastStateClimbingBool && isClimbing) Logger.LogInfo("------------#The Player has reached a hold#------------");
                 lastStateClimbingBool = isClimbing;
             }
 
@@ -114,20 +104,17 @@ namespace CramponDebug
                 bool usingRightAxe = iceaxes.usingIceAxeR;
 
 
-                if (!lastStateUsingAxeL && usingLextAxe) LoggerInstance.Msg("#The Player has equipped the left ice axe#");
-                if (lastStateUsingAxeL && !usingLextAxe) LoggerInstance.Msg("#The Player has unequipped the left ice axe#");
+                if (!lastStateUsingAxeL && usingLextAxe) Logger.LogInfo("#The Player has equipped the left ice axe#");
+                if (lastStateUsingAxeL && !usingLextAxe) Logger.LogInfo("#The Player has unequipped the left ice axe#");
 
-                if (!lastStateUsingAxeR && usingRightAxe) LoggerInstance.Msg("#The Player has equipped the right ice axe#");
-                if (lastStateUsingAxeR && !usingRightAxe) LoggerInstance.Msg("#The Player has unequipped the right ice axe#");
+                if (!lastStateUsingAxeR && usingRightAxe) Logger.LogInfo("#The Player has equipped the right ice axe#");
+                if (lastStateUsingAxeR && !usingRightAxe) Logger.LogInfo("#The Player has unequipped the right ice axe#");
 
 
                 lastStateUsingAxeL = usingLextAxe;
                 lastStateUsingAxeR = usingRightAxe;
             }
         }
-
-
-
 
         public void GetObjects()
         {
@@ -136,12 +123,11 @@ namespace CramponDebug
             if (climbing == null) climbing = UnityEngine.Object.FindObjectOfType<Climbing>();
             if (stemFoot == null) stemFoot = UnityEngine.Object.FindObjectOfType<StemFoot>();
             if (iceaxes == null) iceaxes = UnityEngine.Object.FindObjectOfType<IceAxe>();
-            
+
             // Get Input
             player = ReInput.players.GetPlayer(playerID);
 
         }
-
 
         public void IceAxeTimer()
         {
@@ -154,7 +140,7 @@ namespace CramponDebug
             {
                 if (iceAxeForceL > 0f && usedAxeL)
                 {
-                    LoggerInstance.Warning("!LEFT AXE input attempted while on cooldown!");
+                    Logger.LogError("!LEFT AXE input attempted while on cooldown!");
                 }
 
                 if (!isTrackingHandTimerL && iceAxeForceL <= 0f)
@@ -168,7 +154,7 @@ namespace CramponDebug
                 {
                     // Arm was just used again — stop the timer
                     float delay = Time.time - handTimerStartL;
-                    LoggerInstance.Msg($"-Left axe was off cooldown for {delay:F2} seconds before being used again.");
+                    Logger.LogInfo($"-Left axe was off cooldown for {delay:F2} seconds before being used again.");
                     isTrackingHandTimerL = false;
                 }
             }
@@ -177,7 +163,7 @@ namespace CramponDebug
             {
                 if (iceAxeForceR > 0f && usedAxeR)
                 {
-                    LoggerInstance.Warning("!RIGHT AXE input attempted while on cooldown!");
+                    Logger.LogError("!RIGHT AXE input attempted while on cooldown!");
                 }
 
                 if (!isTrackingHandTimerR && iceAxeForceR <= 0f)
@@ -191,7 +177,7 @@ namespace CramponDebug
                 {
                     // Arm was just used again — stop the timer
                     float delay = Time.time - handTimerStartR;
-                    LoggerInstance.Msg($"-Right axe was off cooldown for {delay:F2} seconds before being used again.");
+                    Logger.LogInfo($"-Right axe was off cooldown for {delay:F2} seconds before being used again.");
                     isTrackingHandTimerR = false;
                 }
             }
@@ -206,7 +192,7 @@ namespace CramponDebug
 
             if (armForceL > 0f && usedArmL)
             {
-                LoggerInstance.Warning("!LEFT ARM input attempted while on cooldown!");
+                Logger.LogError("!LEFT ARM input attempted while on cooldown!");
             }
 
             if (!isTrackingHandTimerL && armForceL <= 0f)
@@ -215,20 +201,18 @@ namespace CramponDebug
                 handTimerStartL = Time.time;
                 isTrackingHandTimerL = true;
             }
-            
             else if (isTrackingHandTimerL && armForceL > 0f)
             {
                 // Arm was just used again — stop the timer
                 float delay = Time.time - handTimerStartL;
-                LoggerInstance.Msg($"-Left hand was off cooldown for {delay:F2} seconds before being used again.");
+                Logger.LogInfo($"-Left hand was off cooldown for {delay:F2} seconds before being used again.");
                 isTrackingHandTimerL = false;
             }
 
 
-
             if (armForceR > 0f && usedArmR)
             {
-                LoggerInstance.Warning("!RIGHT ARM input attempted while on cooldown!");
+                Logger.LogError("!RIGHT ARM input attempted while on cooldown!");
             }
 
             if (!isTrackingHandTimerR && armForceR <= 0f)
@@ -237,19 +221,14 @@ namespace CramponDebug
                 handTimerStartR = Time.time;
                 isTrackingHandTimerR = true;
             }
-            
             else if (isTrackingHandTimerR && armForceR > 0f)
             {
                 // Arm was just used again — stop the timer
                 float delay = Time.time - handTimerStartR;
-                LoggerInstance.Msg($"-Right hand was off cooldown for {delay:F2} seconds before being used again.");
+                Logger.LogInfo($"-Right hand was off cooldown for {delay:F2} seconds before being used again.");
                 isTrackingHandTimerR = false;
             }
-
         }
-
-
-
 
         public void CramponTimer()
         {
@@ -261,7 +240,7 @@ namespace CramponDebug
                 // Player tried to Wall Kick during cooldown
                 if (isOnCooldown && usedWallKick)
                 {
-                    LoggerInstance.Warning("!CRAMPON input attempted while on cooldown!");
+                    Logger.LogError("!CRAMPON input attempted while on cooldown!");
                 }
 
                 // Crampons came off cooldown - Start timing
@@ -275,11 +254,10 @@ namespace CramponDebug
                 else if (isOnCooldown && isTrackingCramponTimer)
                 {
                     float delay = Time.time - cramponTimerStart;
-                    LoggerInstance.Msg($"*Crampons were off cooldown for {delay:F2} seconds before being used.");
+                    Logger.LogInfo($"*Crampons were off cooldown for {delay:F2} seconds before being used.");
                     isTrackingCramponTimer = false;
                 }
             }
         }
-
     }
 }
