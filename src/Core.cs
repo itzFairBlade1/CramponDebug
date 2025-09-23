@@ -1,263 +1,81 @@
-﻿using System.Reflection;
-
-using BepInEx;
-using Rewired;
+﻿using BepInEx;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace CramponDebug
 {
     [BepInPlugin("com.github.itzFairBlade1.CramponDebug", "Crampon Debug", PluginInfo.PLUGIN_VERSION)]
     public class Core : BaseUnityPlugin
     {
-        private bool lastStateGroundedBool;
-        private bool lastStateClimbingBool;
+        // Cache for accessing objects in the current scene
+        private Cache cache;
 
-        private PlayerMove playerMove;
-        private Climbing climbing;
-        private StemFoot stemFoot;
-        private FieldInfo isOnCooldownField;
-        private Player player;
-        private IceAxe iceaxes;
+        // Tracks timings
+        private Tracker tracker;
 
-        private bool isTrackingHandTimerL = false;
-        private bool isTrackingHandTimerR = false;
+        // Displays timings
+        private UI ui;
 
-        private bool isTrackingCramponTimer = false;
-
-        private bool lastStateUsingAxeL = false;
-        private bool lastStateUsingAxeR = false;
-
-        private float handTimerStartL = 0f;
-        private float handTimerStartR = 0f;
-
-        private float cramponTimerStart = 0f;
-
-        private int playerID;
-
+        /**
+         * <summary>
+         * Executes when the plugin is being loaded.
+         * </summary>
+         */
         public void Awake()
         {
-            Logger.LogInfo("CramponDebug Initialized.");
-            isOnCooldownField = typeof(StemFoot).GetField("isOnCooldown", BindingFlags.NonPublic | BindingFlags.Instance);
+            // Create cache and tracker
+            cache = new Cache();
+            tracker = new Tracker(cache);
+            ui = new UI(tracker);
+
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
         }
 
-        public void Update()
+        /**
+         * <summary>
+         * Executes when the plugin is destroyed.
+         * </summary>
+         */
+        public void OnDestroy()
         {
-            GetObjects(); // Loads Scripts
-            CheckHastagProperties(); // Logs Hashtag Infos
-            CheckTiming(); // Responsible for everything else .-.
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
         }
 
-        public void CheckTiming()
+        /**
+         * <summary>
+         * Executes when a scene is loaded.
+         * </summary>
+         * <param name="scene">The scene which loaded</param>
+         * <param name="mode">The mode the scene loaded with</param>
+         */
+        public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            // check if scripts loaded
-            if (playerMove != null && climbing != null)
-            {
-                bool isClimbing = climbing.grabbingLeft || climbing.grabbingRight;
-                bool isGrounded = playerMove.IsGrounded();
-
-                // checking if player is in air and not falling
-                if (!isClimbing && !isGrounded && climbing.playerBody.velocity.y > -7)
-                {
-                    //checking iceaxes
-                    if (iceaxes != null)
-                    {
-                        if (iceaxes.usingIceAxeR || iceaxes.usingIceAxeL) IceAxeTimer();
-                        else HandTimer();
-                    }
-
-                    else HandTimer();
-
-                    CramponTimer();
-                }
-
-                else
-                {
-                    isTrackingCramponTimer = false;
-                    isTrackingHandTimerL = false;
-                    isTrackingHandTimerR = false;
-                }
-            }
+            // Update the cache
+            cache.FindObjects();
         }
 
-        public void CheckHastagProperties()
+        /**
+         * <summary>
+         * Executes when a scene is unloaded.
+         * </summary>
+         * <param name="scene">The scene which unloaded</param>
+         */
+        public void OnSceneUnloaded(Scene scene)
         {
-            // player touching ground
-            if (playerMove != null)
-            {
-                bool isGrounded = playerMove.IsGrounded();
-                if (!lastStateGroundedBool && isGrounded) Logger.LogInfo("------------#The Player is grounded#------------");
-                lastStateGroundedBool = isGrounded;
-            }
-
-            // reaching a hold
-            if (climbing != null)
-            {
-                bool isClimbing = climbing.grabbingLeft || climbing.grabbingRight;
-                if (!lastStateClimbingBool && isClimbing) Logger.LogInfo("------------#The Player has reached a hold#------------");
-                lastStateClimbingBool = isClimbing;
-            }
-
-            // iceaxe switching
-            if (iceaxes != null)
-            {
-                bool usingLextAxe = iceaxes.usingIceAxeL;
-                bool usingRightAxe = iceaxes.usingIceAxeR;
-
-
-                if (!lastStateUsingAxeL && usingLextAxe) Logger.LogInfo("#The Player has equipped the left ice axe#");
-                if (lastStateUsingAxeL && !usingLextAxe) Logger.LogInfo("#The Player has unequipped the left ice axe#");
-
-                if (!lastStateUsingAxeR && usingRightAxe) Logger.LogInfo("#The Player has equipped the right ice axe#");
-                if (lastStateUsingAxeR && !usingRightAxe) Logger.LogInfo("#The Player has unequipped the right ice axe#");
-
-
-                lastStateUsingAxeL = usingLextAxe;
-                lastStateUsingAxeR = usingRightAxe;
-            }
+            // Clear the cache
+            cache.Clear();
         }
 
-        public void GetObjects()
+        /**
+         * <summary>
+         * Updates the UI
+         * </summary>
+         */
+        public void OnGUI()
         {
-            // Attempts to find scripts
-            if (playerMove == null) playerMove = UnityEngine.Object.FindObjectOfType<PlayerMove>();
-            if (climbing == null) climbing = UnityEngine.Object.FindObjectOfType<Climbing>();
-            if (stemFoot == null) stemFoot = UnityEngine.Object.FindObjectOfType<StemFoot>();
-            if (iceaxes == null) iceaxes = UnityEngine.Object.FindObjectOfType<IceAxe>();
-
-            // Get Input
-            player = ReInput.players.GetPlayer(playerID);
-
-        }
-
-        public void IceAxeTimer()
-        {
-            float iceAxeForceL = iceaxes.forceCooldownL;
-            float iceAxeForceR = iceaxes.forceCooldownR;
-            bool usedAxeL = player.GetButtonDown("Arm Left");
-            bool usedAxeR = player.GetButtonDown("Arm Right");
-
-            if (iceaxes.usingIceAxeL)
-            {
-                if (iceAxeForceL > 0f && usedAxeL)
-                {
-                    Logger.LogError("!LEFT AXE input attempted while on cooldown!");
-                }
-
-                if (!isTrackingHandTimerL && iceAxeForceL <= 0f)
-                {
-                    // Arm just became usable — start the timer
-                    handTimerStartL = Time.time;
-                    isTrackingHandTimerL = true;
-                }
-
-                else if (isTrackingHandTimerL && iceAxeForceL > 0f)
-                {
-                    // Arm was just used again — stop the timer
-                    float delay = Time.time - handTimerStartL;
-                    Logger.LogInfo($"-Left axe was off cooldown for {delay:F2} seconds before being used again.");
-                    isTrackingHandTimerL = false;
-                }
-            }
-
-            if (iceaxes.usingIceAxeR)
-            {
-                if (iceAxeForceR > 0f && usedAxeR)
-                {
-                    Logger.LogError("!RIGHT AXE input attempted while on cooldown!");
-                }
-
-                if (!isTrackingHandTimerR && iceAxeForceR <= 0f)
-                {
-                    // Arm just became usable — start the timer
-                    handTimerStartR = Time.time;
-                    isTrackingHandTimerR = true;
-                }
-
-                else if (isTrackingHandTimerR && iceAxeForceR > 0f)
-                {
-                    // Arm was just used again — stop the timer
-                    float delay = Time.time - handTimerStartR;
-                    Logger.LogInfo($"-Right axe was off cooldown for {delay:F2} seconds before being used again.");
-                    isTrackingHandTimerR = false;
-                }
-            }
-        }
-
-        public void HandTimer()
-        {
-            float armForceL = climbing.armForceTimerL;
-            float armForceR = climbing.armForceTimerR;
-            bool usedArmL = player.GetButtonDown("Arm Left");
-            bool usedArmR = player.GetButtonDown("Arm Right");
-
-            if (armForceL > 0f && usedArmL)
-            {
-                Logger.LogError("!LEFT ARM input attempted while on cooldown!");
-            }
-
-            if (!isTrackingHandTimerL && armForceL <= 0f)
-            {
-                // Arm just became usable — start the timer
-                handTimerStartL = Time.time;
-                isTrackingHandTimerL = true;
-            }
-            else if (isTrackingHandTimerL && armForceL > 0f)
-            {
-                // Arm was just used again — stop the timer
-                float delay = Time.time - handTimerStartL;
-                Logger.LogInfo($"-Left hand was off cooldown for {delay:F2} seconds before being used again.");
-                isTrackingHandTimerL = false;
-            }
-
-
-            if (armForceR > 0f && usedArmR)
-            {
-                Logger.LogError("!RIGHT ARM input attempted while on cooldown!");
-            }
-
-            if (!isTrackingHandTimerR && armForceR <= 0f)
-            {
-                // Arm just became usable — start the timer
-                handTimerStartR = Time.time;
-                isTrackingHandTimerR = true;
-            }
-            else if (isTrackingHandTimerR && armForceR > 0f)
-            {
-                // Arm was just used again — stop the timer
-                float delay = Time.time - handTimerStartR;
-                Logger.LogInfo($"-Right hand was off cooldown for {delay:F2} seconds before being used again.");
-                isTrackingHandTimerR = false;
-            }
-        }
-
-        public void CramponTimer()
-        {
-            if (stemFoot != null && isOnCooldownField != null)
-            {
-                bool isOnCooldown = (bool)isOnCooldownField.GetValue(stemFoot);
-                bool usedWallKick = player.GetButtonDown("Wall Kick");
-
-                // Player tried to Wall Kick during cooldown
-                if (isOnCooldown && usedWallKick)
-                {
-                    Logger.LogError("!CRAMPON input attempted while on cooldown!");
-                }
-
-                // Crampons came off cooldown - Start timing
-                if (!isOnCooldown && !isTrackingCramponTimer)
-                {
-                    cramponTimerStart = Time.time;
-                    isTrackingCramponTimer = true;
-                }
-
-                // Crampons went on cooldown again - Log timing and missed inputs
-                else if (isOnCooldown && isTrackingCramponTimer)
-                {
-                    float delay = Time.time - cramponTimerStart;
-                    Logger.LogInfo($"*Crampons were off cooldown for {delay:F2} seconds before being used.");
-                    isTrackingCramponTimer = false;
-                }
-            }
+            ui.Render();
         }
     }
 }
