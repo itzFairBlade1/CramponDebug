@@ -4,13 +4,12 @@ a mod that displays your crampon and hand/pickaxe timing.
 
 it also shows if youre grounded, have swapped to pickaxes or have reached a hold
 
-
-It displays wrong timings as a warning in yellow and right timings in gray.
+It displays wrong timings as a warning in yellow/red and right timings in gray.
 
 
 # -REQUIREMENTS-
 
-melonLoader
+melonLoader or BepInEx
 
 a pc (nooo wayyyy)
 
@@ -19,9 +18,9 @@ a pc (nooo wayyyy)
 
 download the dll file from the githubs release page
 
-put .dll file into the melonLoader's generated Mods folder
+MelonLoader: put .dll file into the melonLoader's generated Mods folder
 
-melonLoader download: https://melonwiki.xyz/#
+BepInEx: put .dll file into BepInEx's generated plugins folder
 
 
 # -MORE-
