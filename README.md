@@ -9,8 +9,11 @@ It displays wrong timings as a warning in yellow/red and right timings in gray.
 
 # -REQUIREMENTS-
 
-BepInEx
+BepInEx with Console enabled (if using Console version)
+
 Peaks Of Yore
+
+A Computer
 
 
 # -KEYBINDS-
@@ -19,7 +22,7 @@ Press 'M' to open/close the UI
 
 # -ADDITIONAL-
 
-There are two files in the zip file but both of them can be used alone!
+There are two files in the zip file but both of them can be used alone or together!
 
 Expect Bugs
 
