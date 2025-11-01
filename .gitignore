@@ -1,0 +1,32 @@
+# Ignore build files
+/bin/
+/obj/
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# Ignore Unity temporary files
+Library/
+Temp/
+Logs/
+UserSettings/
+Build/
+
+# Ignore IDE files
+.vscode/
+*.user
+*.suo
+.vs/
+
+# Ignore other system files
+.DS_Store
+Thumbs.db
+
+# random gitignore stuff i stole
+.vs
+bin
+**/obj
+GamePath.props
+build/*.zip
