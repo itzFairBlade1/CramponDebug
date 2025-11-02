@@ -57,8 +57,9 @@ namespace CramponDebugUI
             // Animate currentX toward targetX
             currentX = Mathf.Lerp(currentX, targetX, Time.deltaTime * animationSpeed);
 
-            // Bottom-left Y position
-            float y = screenHeight - boxHeight - 10f;
+            // Middle-left Y position
+            float y = Mathf.Floor(screenHeight/2 - boxHeight/2);
+            
 
             // Clamp timer values
             float armTimerL = Mathf.Max(0f, tracker.armTimerL);
