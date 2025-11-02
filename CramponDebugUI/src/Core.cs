@@ -26,7 +26,7 @@ namespace CramponDebugUI
             // Create cache and tracker
             cache = new Cache();
             tracker = new Tracker(cache);
-            ui = new UI(tracker, this);
+            ui = new UI(tracker);
 
             SceneManager.sceneLoaded += OnSceneLoaded;
             SceneManager.sceneUnloaded -= OnSceneUnloaded;

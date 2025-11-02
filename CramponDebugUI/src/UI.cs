@@ -5,16 +5,18 @@ namespace CramponDebugUI
     public class UI
     {
         private Tracker tracker;
-        private Core core;
-
-        private float currentX;            // Current X position for sliding
-        private float targetX = 10f;       // Final X position (on-screen)
-        private float onScreenX = 10f;
-        private float offScreenX = -260f;  
-        private float animationSpeed = 5f;
 
         private float boxWidth = 250f;
         private float boxHeight = 170f;
+
+        private float screenHeight = Screen.height;
+        private float y;
+
+        private float currentX;            // Current X position for sliding
+        private float targetX = 10f;       // Target X position gets set to onScreenX or offScreenX
+        private float onScreenX = 10f;     // X position on screen
+        private float offScreenX = -260f;  // X position off screen
+        private float animationSpeed = 5f;
 
         private bool isOnScreen;
 
@@ -24,10 +26,10 @@ namespace CramponDebugUI
          * </summary>
          * <param name="tracker">The tracker to get timers from</param>
          */
-        public UI(Tracker tracker, Core core)
+        public UI(Tracker tracker)
         {
             this.tracker = tracker;
-            this.core = core;
+            y = Mathf.Floor(screenHeight / 2 - boxHeight / 2);
         }
 
         public void Switch()
@@ -52,14 +54,8 @@ namespace CramponDebugUI
          */
         public void Render()
         {
-            float screenHeight = Screen.height;
-
             // Animate currentX toward targetX
             currentX = Mathf.Lerp(currentX, targetX, Time.deltaTime * animationSpeed);
-
-            // Middle-left Y position
-            float y = Mathf.Floor(screenHeight/2 - boxHeight/2);
-            
 
             // Clamp timer values
             float armTimerL = Mathf.Max(0f, tracker.armTimerL);
