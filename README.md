@@ -2,6 +2,8 @@
 
 > ⚠ **This mod has required dependencies and will not work without them.**
 
+![Icon](images/10-Point_Crampons.png)
+
 A lightweight debug mod that displays **timing information for crampons, hands, and pickaxes** to help identify correct and incorrect climbing inputs.
 
 ---
