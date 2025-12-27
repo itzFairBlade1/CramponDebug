@@ -5,9 +5,6 @@ namespace CramponDebug
 {
     public class Tracker
     {
-
-
-        // The object cache
         private Cache cache;
 
         // Important fields

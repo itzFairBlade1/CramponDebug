@@ -22,13 +22,12 @@ namespace CramponDebug
         private UI ui;
 
         // Mod Menu config
-        private static Cfg config;
+        private Cfg config;
 
         // Extra Console output
         private ConsoleOutput consoleOutput;
 
-        // Flag for Update UI creation
-        private bool uiCreated = false;
+        public static bool createdUI = false;
 
         /**
          * <summary>
@@ -41,7 +40,7 @@ namespace CramponDebug
             config = new Cfg(this.Config);
             cache = new Cache();
             tracker = new Tracker(cache);
-            ui = new UI(tracker, this);
+            ui = new UI(tracker, this, cache, config);
             consoleOutput = new ConsoleOutput(this, tracker, cache, config);
 
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -92,6 +91,17 @@ namespace CramponDebug
         {
             // Update the cache
             cache.FindObjects();
+
+            // Create UI elements
+            if (cache.IsComplete() && !createdUI)
+            {
+                ui.CreateElements();
+                createdUI = true;
+            }
+
+            // Make UI visible only if values can change
+            if (!cache.IsComplete() && createdUI) ui.ToggleVisibility(false);
+            else if (cache.IsComplete() && createdUI) ui.ToggleVisibility(true);
         }
 
         /**

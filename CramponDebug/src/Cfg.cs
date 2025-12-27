@@ -10,6 +10,10 @@ namespace CramponDebug
         [Field("Toggle UI Keybind", "Toggles the Crampon Debug UI on or off.")]
         internal ConfigEntry<KeyCode> UIToggleBind;
 
+        [Listener(typeof(UI), nameof(UI.ReCreateElements))]
+        [Field(FieldType.Slider, min = 0f, max = 1f, description = "The alpha value of the black screen behind the text", name = "Background Opacity")]
+        internal ConfigEntry<float> BackgroundOpacity;
+
         [Field("Console Output", "Extra information shown in the console.")]
         internal ConfigEntry<bool> ConsoleOutput;
 
@@ -26,7 +30,7 @@ namespace CramponDebug
             );
 
             ConsoleOutput = config.Bind<bool>(
-                "General",
+                "Console Output",
                 "Console Output",
                 false,
                 "Extra information shown in the console."
@@ -37,6 +41,13 @@ namespace CramponDebug
                 "Wrong Timing Only",
                 false,
                 "disables the display of other console output messages"
+            );
+
+            BackgroundOpacity = config.Bind<float>(
+                "UI Settings",
+                "Background Opacity",
+                0.6f,
+                "The alpha value of the black screen behind the text"
             );
         }
     }
