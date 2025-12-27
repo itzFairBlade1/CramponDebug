@@ -37,6 +37,9 @@ Incorrect timings are highlighted as **warnings** (yellow/red), while correct ti
 ### Console Output
 ![Console Output](images/Console.png)
 
+### Mod Menu
+![Mod Menu](images/Mod%20Menu.png)
+
 ---
 
 ## Keybinds
