@@ -1,35 +1,75 @@
-# -DESCRIPTION-
+# Crampon Debug
 
-a mod that displays your crampon and hand/pickaxe timing.
+> ⚠ **This mod has required dependencies and will not work without them.**
 
-it also shows if youre grounded, have swapped to pickaxes or have reached a hold
+A lightweight debug mod that displays **timing information for crampons, hands, and pickaxes** to help identify correct and incorrect climbing inputs.
 
-It displays wrong timings as a warning in yellow/red and right timings in gray.
+---
 
+## Description
 
-# -REQUIREMENTS-
+**Crampon Debug** provides both an on-screen UI and optional console output that tracks:
 
-BepInEx with Console enabled (if using Console version)
+- Hand timing  
+- Pickaxe timing  
+- Crampon timing  
+- Grounded state  
+- Pickaxe swap state  
+- Hold reach detection  
 
-Peaks Of Yore
+Incorrect timings are highlighted as **warnings** (yellow/red), while correct timings are shown in **neutral gray** for clarity.
 
-A Computer
+### Timing Reference Values
 
+- **Hand timing:** 100 BPM (≈ 0.6s)  
+- **Pickaxe timing:** 85 BPM (≈ 0.7s)  
+- **Crampon timing:** 60 BPM (≈ 1.0s)
 
-# -KEYBINDS-
+---
 
-Press 'M' to open/close the UI
+## Preview
 
-# -ADDITIONAL-
+### UI Overlay
+![UI Overlay](images/UI%20update.png)
 
-There are two files in the zip file but both of them can be used alone or together!
+### Console Output
+![Console Output](images/Console.png)
 
-Expect Bugs
+---
 
-# -IMAGES-
+## Keybinds
 
+- **Toggle UI:** `M` (default)  
+  - Can be changed via **Mod Menu**
 
-![The UI Version](images/UI%20update.png)
+---
 
+## Requirements
 
-![The Console Version](images/Console.png)
+The following dependencies are **required**:
+
+- **BepInEx**  
+  https://github.com/BepInEx/BepInEx  
+  *(Console must be enabled if `ConsoleOutput` is turned on)*
+
+- **UILib**  
+  https://github.com/Kaden5480/poy-ui-lib
+
+- **Mod Menu**  
+  https://github.com/Kaden5480/poy-mod-menu
+
+Make sure all dependencies are installed before launching the game.
+
+---
+
+## Notes
+
+- This is a **debug-focused mod**
+- Bugs and edge cases are expected
+- UI and timing behavior may change over time
+
+---
+
+## License
+
+This project is licensed under the **GPL-3.0** License.
