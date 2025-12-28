@@ -36,7 +36,7 @@ namespace CramponDebug.src
 
         private bool isTrackingCramponTimer = false;
 
-
+        // Constructah constructs the constructor parameters for the class with the constructah
         internal ConsoleOutput(Core core, Tracker tracker, Cache cache, Cfg config)
         {
             this.core = core;
@@ -45,6 +45,11 @@ namespace CramponDebug.src
             this.config = config;
         }
 
+        /**
+         * <summary>
+         * Gets put in the Update method, calls all the timers.
+         * </summary>
+         */
         public void LogTimers()
         {
             player = ReInput.players.GetPlayer(playerID);
@@ -132,6 +137,11 @@ namespace CramponDebug.src
             }
         }
 
+        /**
+         * <summary>
+         * The timer logic. Is changed based on config.
+         * </summary>
+         */
         private void Timer(float forceCooldown, bool getButtonDown, bool usingItem, ref float globalTimer, ref bool isTracking, string errorMessage, string succesfulMessage)
         {
             if (usingItem)
@@ -142,26 +152,33 @@ namespace CramponDebug.src
                     core.Log(errorMessage, true);
                 }
 
-                // start tracking when force cooldown is below 0f
-                if (!isTracking && forceCooldown <= 0f)
+                if (!config.OnlyShowWrongTiming.Value)
                 {
-                    // item just became usable — start the timer
-                    globalTimer = Time.time;
-                    isTracking = true;
-                }
+                    // start tracking when force cooldown is below 0f
+                    if (!isTracking && forceCooldown <= 0f)
+                    {
+                        // item just became usable — start the timer
+                        globalTimer = Time.time;
+                        isTracking = true;
+                    }
 
-                // stop tracking when force cooldown is above 0f
-                else if (isTracking && forceCooldown > 0f)
-                {
-                    // item was just used - stop the timer
-                    float delay = Time.time - globalTimer;
-                    if (!config.OnlyShowWrongTiming.Value)
+                    // stop tracking when force cooldown is above 0f
+                    else if (isTracking && forceCooldown > 0f)
+                    {
+                        // item was just used - stop the timer
+                        float delay = Time.time - globalTimer;
                         core.Log(succesfulMessage + $" {delay:F2} seconds.");
-                    isTracking = false;
-                }
+                        isTracking = false;
+                    }
+                }       
             }   
         }
 
+        /**
+         * <summary>
+         * Does extra checks for and prints them to the console.
+         * </summary>
+         */
         private void CheckHastagProperties()
         {
             // Grounded Check
@@ -187,21 +204,41 @@ namespace CramponDebug.src
             lastStateUsingAxeR = usingRightAxe;
         }
 
+        /**
+         * <summary>
+         * Checks if the player is using the left or right ice axe.
+         * </summary>
+         */
         private bool usingIceAxes()
         {
             return (cache.iceAxes.usingIceAxeR || cache.iceAxes.usingIceAxeL);
         }
 
+        /**
+         * <summary>
+         * Checks if player is fallingr.
+         * </summary>
+         */
         private bool isFalling()
         {
             return (cache.climbing.playerBody.velocity.y < -7);
         }
 
+        /**
+         * <summary>
+         * Checks if the player is in the air.
+         * </summary>
+         */
         private bool isAirborne()
         {
             return (!isClimbing() && !cache.playerMove.IsGrounded());
         }
 
+        /**
+         * <summary>
+         * Checks if climbing.
+         * </summary>
+         */
         private bool isClimbing()
         {
             return (cache.climbing.grabbingLeft || cache.climbing.grabbingRight);

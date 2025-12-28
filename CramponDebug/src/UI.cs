@@ -1,3 +1,4 @@
+using ES3Types;
 using UILib;
 using UILib.Components;
 using UILib.Layouts;
@@ -21,12 +22,11 @@ namespace CramponDebug
         private const int FONT_SIZE = 33;
         private const int ELEMENT_SPACING = 7;
 
-        private  float currentX;            // Current X position for sliding
-        private  float currentOffset;      // Current offset X position for sliding
-        private  float targetX = 0f;       // Target X position gets set to onScreenX or offScreenX
-        private  float onScreenX = 0f;     // X position on screen
-        private  float offScreenX = -360f;  // X position off screen
-        private  float animationSpeed = 5f;
+        private  float targetX;       // Target X position gets set to onScreenX or offScreenX
+        private  float onScreenX;     // X position on screen
+        private  float offScreenX;  // X position off screen
+        private float currentX;     // Current X position for sliding starts off screen
+        private  float animationSpeed;
 
         // UI Elements
         private Overlay overlay;
@@ -36,7 +36,7 @@ namespace CramponDebug
         private Label iceAxeTimerRLabel;
         private Label cramponTimerLabel;
 
-        private bool isOnScreen;
+        private bool isOnScreen; // if targetX is onScreenX has to be set to true
 
         /**
          * <summary>
@@ -53,23 +53,25 @@ namespace CramponDebug
             instance = this;
         }
 
-        public void ToggleVisibility(bool visibility)
+        /**
+         * <summary>
+         * Hides and shows the UI depending on if in game.
+         * </summary>
+         */
+        public void SetVisisbility(bool visibility)
         {
-            bool currentlyVisible = overlay.isVisible;
-
-            if (!visibility && currentlyVisible) overlay.ToggleVisibility();
-            else if (visibility && !currentlyVisible) overlay.ToggleVisibility();
+            if (visibility) overlay.Show();
+            else overlay.Hide();
         }
 
         /**
          * <summary>
          * Animates the UIs by saving toggle States.
          * </summary>
-         * <param name="tracker">The tracker to get timers from</param>
          */
         public static void Toggle()
         {
-            instance.ToggleInternal();
+            instance.ToggleInternal(); // woohoooo static workaround this is fineeeeee
         }
 
         public void ToggleInternal()
@@ -87,9 +89,14 @@ namespace CramponDebug
             }
         }
 
+        /**
+         * <summary>
+         * Recreates the UI elements when Config values change. Called by listener.
+         * </summary>
+         */
         public static void ReCreateElements(float value)
         {
-            instance.ReCreateElementsInternal();
+            instance.ReCreateElementsInternal(); // guess what we do it again
         }
 
         private void ReCreateElementsInternal()
@@ -117,6 +124,26 @@ namespace CramponDebug
          */
         public void CreateElements()
         {
+            // Animation parameters
+            if (config.DefaultOnScreen.Value)
+            {
+                targetX = 10f;
+                isOnScreen = true;
+            }
+                
+            else
+            {
+                targetX = -360f;
+                isOnScreen = false;
+            } 
+                
+            onScreenX = 10f;     
+            offScreenX = -360f;  
+            currentX = -360f;     
+            animationSpeed = config.animationSpeed.Value; // Default 4
+
+            
+
             Theme theme = Theme.GetTheme();
             Color bgColor = theme.background;
             bgColor.a = config.BackgroundOpacity.Value;
@@ -128,8 +155,11 @@ namespace CramponDebug
             overlay = new Overlay(BOX_WIDTH, BOX_HEIGHT);
             overlay.SetContentLayout(LayoutType.Vertical);
 
-            currentOffset = (Screen.width / 2 - BOX_WIDTH / 2) * -1;
-            overlay.SetOffset(currentOffset + currentX, 0f);
+            // Positioning
+            overlay.SetAnchor(AnchorType.MiddleLeft);
+            overlay.SetOffset(currentX, 0f);
+
+
             overlay.SetElementSpacing(ELEMENT_SPACING);
             overlay.SetLockMode(LockMode.None);
 
@@ -181,7 +211,7 @@ namespace CramponDebug
             float cramponTimer = Mathf.Max(0f, tracker.cramponTimer);
 
             // Sets offsets and text for UILib elements
-            overlay.SetOffset(currentOffset + currentX, 0f);
+            overlay.SetOffset(currentX, 0f);
 
             armTimerLLabel.SetText($"Left Arm:     {armTimerL:F2}");
             armTimerLLabel.SetColor(armTimerL == 0 ? Color.green : Color.red);

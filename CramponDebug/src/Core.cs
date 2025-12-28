@@ -54,6 +54,11 @@ namespace CramponDebug
             info.Add(config);
         }
 
+        /**
+         * <summary>
+         * Runs after Awake.
+         * </summary>
+         */
         public void Start()
         {
             // Creates the UI toggle shortcut
@@ -62,6 +67,11 @@ namespace CramponDebug
             shortcut.onTrigger.AddListener(UI.Toggle);
         }
 
+        /**
+         * <summary>
+         * Runs once per frame.
+         * </summary>
+         */
         public void Update()
         {
             if (config.ConsoleOutput.Value)
@@ -100,8 +110,8 @@ namespace CramponDebug
             }
 
             // Make UI visible only if values can change
-            if (!cache.IsComplete() && createdUI) ui.ToggleVisibility(false);
-            else if (cache.IsComplete() && createdUI) ui.ToggleVisibility(true);
+            if (!cache.IsComplete() && createdUI) ui.SetVisisbility(false);
+            else if (cache.IsComplete() && createdUI) ui.SetVisisbility(true);
         }
 
         /**
@@ -116,6 +126,11 @@ namespace CramponDebug
             cache.Clear();
         }
 
+        /**
+         * <summary>
+         * Logs a message to the BepInEx console. Can only be done in BaseUnityPlugin classes.
+         * </summary>
+         */
         public void Log(string message, bool isError = false)
         {
             if (!isError) Logger.LogInfo(message);

@@ -27,7 +27,6 @@ namespace CramponDebug
          * </summary>
          * <param name="cache">The cache to read objects from</param>
          */
-
         public Tracker(Cache cache)
         {
             this.cache = cache;
